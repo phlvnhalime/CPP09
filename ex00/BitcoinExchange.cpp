@@ -42,7 +42,7 @@ void BitcoinExchange::_loadDataBase(const std::string& filename)
 
         std::string date = line.substr(0, pos);
         std::string rateString = line.substr(pos + 1);
-        _loadData[date] = std::strtod(rateString.c_str(), NULL);
+        _loadData[date] = std::strtod(rateString.c_str(), NULL); // convert the initial portion of the string pointed to by nptr to double, float, and long double representation
     }
     file.close();
 }
@@ -72,7 +72,18 @@ int BitcoinExchange::_isValidData(const std::string& date)
         return 0;
     return 1;
 }
+/*
+    Find the first non-space character in the string
+    Find the last non-space character in the string
+    Return the substring between the first and last non-space characters!
+    Be carefull - - A B C - - -> A B C 
+                    |   |
+                    |   |
+                    |   ----> Last
+                    |  !(Last - First = 5 - 3 = 2) But there are 3 characters in the substring not 2
+                    ---> First
 
+*/
 std::string BitcoinExchange::_trim(const std::string& str){
     size_t start = str.find_first_not_of(" \t");
     if(start == std::string::npos)
@@ -91,15 +102,17 @@ void BitcoinExchange::_findExactDate(const std::string& date, float value)
         std::cout << "Error: database is empty" << std::endl;
         return;
     }
+    // Find the biggest date before the given date
     std::map<std::string, float>::iterator it = _loadData.upper_bound(date);
+    // upper_bound is a binary search function that returns an iterator to the first element greater than the given value
     if(it == _loadData.begin())
     {
         std::cout << "Error: date too early" << std::endl;
         return;
     }
-    it--;
+    it--; // (O(logn)) time complexity to find the exact date in the data base
     float res = value * it->second;
-    std::cout << std::fixed << std::setprecision(2);
+    // std::cout << std::fixed << std::setprecision(2); // to print the result with 2 decimal places
     std::cout << date << " => " << value << " = " << res << std::endl;
 }
 
@@ -142,7 +155,7 @@ void BitcoinExchange::processInput(const std::string &filename)
         }
 
         char *end;
-        float value = std::strtof(fileValue.c_str(), &end);
+        float value = std::strtod(fileValue.c_str(), &end);
         if(end == fileValue.c_str() || *end != '\0')
         {
             std::cerr << "Error: bad input => " << line << std::endl;

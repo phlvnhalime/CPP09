@@ -14,18 +14,18 @@ class BitcoinExchange
     private:
         std::map<std::string, float> _loadData;
 
-        // Helper functions
+        // Helper functions user doesn't need to know about
         void _loadDataBase(const std::string& filename);
         int _isValidData(const std::string& date);
         void _findExactDate(const std::string& date, float value);
         std::string _trim(const std::string& str);
     public:
-    BitcoinExchange();
-    ~BitcoinExchange();
-    BitcoinExchange(const BitcoinExchange& copy);
-    BitcoinExchange& operator=(const BitcoinExchange& copy);
+        BitcoinExchange();
+        ~BitcoinExchange();
+        BitcoinExchange(const BitcoinExchange& copy);
+        BitcoinExchange& operator=(const BitcoinExchange& copy);
 
-    void processInput(const std::string& filename);
+        void processInput(const std::string& filename);
 };
 
 #endif
