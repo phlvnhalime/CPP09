@@ -18,8 +18,10 @@ $(NAME): $(OBJS)
 
 clean:
 	rm -f $(OBJS)
+	rm -f "*.txt"
 
 fclean: clean
 	rm -f $(NAME)
+	rm -f '*.txt'
 
 re: fclean all

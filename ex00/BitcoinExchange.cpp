@@ -36,15 +36,12 @@ void BitcoinExchange::_loadDataBase(const std::string& filename)
     while(std::getline(file, line))
     {
         if(line.empty()) continue;
-        std::stringstream ss(line);
-
+        
         size_t pos = line.find(',');
         if(pos == std::string::npos) continue;
 
-        std::string date, rateString;
-
-        date = line.substr(0, pos);
-        rateString = line.substr(pos + 1);
+        std::string date = line.substr(0, pos);
+        std::string rateString = line.substr(pos + 1);
         _loadData[date] = std::strtod(rateString.c_str(), NULL);
     }
     file.close();
@@ -77,10 +74,12 @@ int BitcoinExchange::_isValidData(const std::string& date)
 }
 
 std::string BitcoinExchange::_trim(const std::string& str){
-    size_t start = str.find_first_not_of(" \t\n\r\f\v");
-    size_t end = str.find_last_not_of(" \t\n\r\f\v");
-    if(start == std::string::npos || end == std::string::npos)
+    size_t start = str.find_first_not_of(" \t");
+    if(start == std::string::npos)
         return "";
+    size_t end = str.find_last_not_of(" \t");
+    if(end == std::string::npos)
+        return str.substr(start);
     return str.substr(start, end - start + 1);
 }
 
@@ -107,38 +106,39 @@ void BitcoinExchange::processInput(const std::string &filename)
     }
     std::string line;
     std::getline(file, line); // pass the first line (header)
+    
     while(std::getline(file, line))
     {
         if(line.empty())
             continue;
-        std::stringstream ss(line);
-        std::string date, sep, fileValue;
-
-        size_t pos;
-        pos = line.find('|');
+        
+        size_t pos = line.find('|');
         if(pos == std::string::npos)
         {
-            std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
+            std::cerr << "Error: bad input => " << line << std::endl;
             continue;
         }
-        date = _trim(line.substr(0, pos));
-        fileValue = _trim(line.substr(pos + 1));
+        
+        std::string date = _trim(line.substr(0, pos));
+        std::string fileValue = _trim(line.substr(pos + 1));
 
         if(!_isValidData(date))
         {
-            std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
+            std::cerr << "Error: bad input => " << line << std::endl;
             continue;
         }
 
         if(fileValue.empty())
         {
-            std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
+            std::cerr << "Error: bad input => " << line << std::endl;
             continue;
         }
 
-        char *end; float value = std::strtod(fileValue.c_str(), &end);
-        if(*end != '\0' && *end != 'f'){
-            std::cerr << "Error: Bad input => " << line << std::endl;
+        char *end;
+        float value = std::strtof(fileValue.c_str(), &end);
+        if(end == fileValue.c_str() || *end != '\0')
+        {
+            std::cerr << "Error: bad input => " << line << std::endl;
             continue;
         }
         if(value < 0)
