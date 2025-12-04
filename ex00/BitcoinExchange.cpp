@@ -35,12 +35,17 @@ void BitcoinExchange::_loadDataBase(const std::string& filename)
     std::getline(file, line);// pass the first line
     while(std::getline(file, line))
     {
+        if(line.empty()) continue;
         std::stringstream ss(line);
+
+        size_t pos = line.find(',');
+        if(pos == std::string::npos) continue;
+
         std::string date, rateString;
-        if(std::getline(ss, date, ',') && std::getline(ss, rateString))
-        {
-            _loadData[date] = std::strtof(rateString.c_str(), NULL); // change the string to float
-        }
+
+        date = line.substr(0, pos);
+        rateString = line.substr(pos + 1);
+        _loadData[date] = std::strtod(rateString.c_str(), NULL);
     }
     file.close();
 }
@@ -71,6 +76,14 @@ int BitcoinExchange::_isValidData(const std::string& date)
     return 1;
 }
 
+std::string BitcoinExchange::_trim(const std::string& str){
+    size_t start = str.find_first_not_of(" \t\n\r\f\v");
+    size_t end = str.find_last_not_of(" \t\n\r\f\v");
+    if(start == std::string::npos || end == std::string::npos)
+        return "";
+    return str.substr(start, end - start + 1);
+}
+
 
 void BitcoinExchange::_findExactDate(const std::string& date, float value)
 {
@@ -84,15 +97,16 @@ void BitcoinExchange::_findExactDate(const std::string& date, float value)
     }
 }
 
-void BitcoinExchange::processInput()
+void BitcoinExchange::processInput(const std::string &filename)
 {
-    std::ifstream file("input.txt");
+    std::ifstream file(filename.c_str());
     if(!file.is_open())
     {
         std::cerr << "Failed to open file" << std::endl;
         exit(1);
     }
     std::string line;
+    std::getline(file, line); // pass the first line (header)
     while(std::getline(file, line))
     {
         if(line.empty())
@@ -100,14 +114,33 @@ void BitcoinExchange::processInput()
         std::stringstream ss(line);
         std::string date, sep, fileValue;
 
-        ss >> date >> sep >> fileValue;
-        if(sep != "|" || !_isValidData(date))
+        size_t pos;
+        pos = line.find('|');
+        if(pos == std::string::npos)
+        {
+            std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
+            continue;
+        }
+        date = _trim(line.substr(0, pos));
+        fileValue = _trim(line.substr(pos + 1));
+
+        if(!_isValidData(date))
         {
             std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
             continue;
         }
 
-        float value = std::strtof(fileValue.c_str(), NULL);
+        if(fileValue.empty())
+        {
+            std::cerr << "Error: Invalid input ! Please check the input file." << std::endl;
+            continue;
+        }
+
+        char *end; float value = std::strtod(fileValue.c_str(), &end);
+        if(*end != '\0' && *end != 'f'){
+            std::cerr << "Error: Bad input => " << line << std::endl;
+            continue;
+        }
         if(value < 0)
         {
             std::cerr << "Error: not a positive number." << std::endl;
