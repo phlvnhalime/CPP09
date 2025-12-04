@@ -86,14 +86,21 @@ std::string BitcoinExchange::_trim(const std::string& str){
 
 void BitcoinExchange::_findExactDate(const std::string& date, float value)
 {
+    if(_loadData.empty())
+    {
+        std::cout << "Error: database is empty" << std::endl;
+        return;
+    }
     std::map<std::string, float>::iterator it = _loadData.upper_bound(date);
     if(it == _loadData.begin())
+    {
         std::cout << "Error: date too early" << std::endl;
-    else{
-        it--;
-        float res = value * it->second;
-        std::cout << date << " => " << value << " = " << res << std::endl;
+        return;
     }
+    it--;
+    float res = value * it->second;
+    std::cout << std::fixed << std::setprecision(2);
+    std::cout << date << " => " << value << " = " << res << std::endl;
 }
 
 void BitcoinExchange::processInput(const std::string &filename)
