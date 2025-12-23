@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <deque>
-#include <algorithm>
 #include <ctime>
 #include <cstdlib>
 #include <cctype>
@@ -21,21 +20,13 @@ class PmergeMe
         void addNumber(int number);
         void sortVec(std::vector<int>& vec);
         void sortDeq(std::deque<int>& deq);
-        void printVec();
-        void printDeq();
+        void printContainer();
 
         // Ford-Johnson helper functions
         std::vector<int> generateJacobsthal(int n);
         std::vector<int> getInsertionOrder(int n);
         int binarySearchInsertPos(std::vector<int>& sorted, int value, int end);
         int binarySearchInsertPosDeq(std::deque<int>& sorted, int value, int end);
-
-        // Time calculation
-        void calculateTime();
-        void calculateTimeVec();
-        void calculateTimeDeq();
-        void printTimeVec(const std::string& time);
-        void printTimeDeq(const std::string& time);
 
     public:
 
@@ -52,8 +43,6 @@ class PmergeMe
         static void stdError(const std::string& message);
         static const std::string ERROR_INVALID_ARGUMENTS_SHORT;
         static const std::string ERROR_INVALID_NUMBER_SHORT;
-        static const std::string ERROR_INVALID_SEQUENCE_SHORT;
-        static const std::string ERROR_INVALID_DUPLICATE_SHORT;
         static const std::string ERROR_INVALID_RANGE_SHORT;
 
 
