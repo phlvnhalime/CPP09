@@ -7,40 +7,56 @@
 #include <algorithm>
 #include <ctime>
 #include <cstdlib>
+#include <cctype>
 
 class PmergeMe
 {
     private:
         std::vector<int> _vec;
         std::deque<int> _deq;
+        double _timeVec;
+        double _timeDeq;
 
+        // Data manipulation
+        void addNumber(int number);
+        void sortVec(std::vector<int>& vec);
+        void sortDeq(std::deque<int>& deq);
+        void printVec();
+        void printDeq();
 
+        // Ford-Johnson helper functions
+        std::vector<int> generateJacobsthal(int n);
+        std::vector<int> getInsertionOrder(int n);
+        int binarySearchInsertPos(std::vector<int>& sorted, int value, int end);
+        int binarySearchInsertPosDeq(std::deque<int>& sorted, int value, int end);
+
+        // Time calculation
+        void calculateTime();
+        void calculateTimeVec();
+        void calculateTimeDeq();
+        void printTimeVec(const std::string& time);
+        void printTimeDeq(const std::string& time);
 
     public:
+
+        // Program Structure and constructor
         PmergeMe();
         ~PmergeMe();
         PmergeMe(const PmergeMe& copy);
         PmergeMe& operator=(const PmergeMe& copy);
 
-        void addNumber(int number);
-        void sortVec();
-        void sortDeq();
-        void printVec();
-        void printDeq();
-        static void stdError(const std::string& message);
+        // Public interface
+        void run(int argc, char **argv);
 
+        // Error handling
+        static void stdError(const std::string& message);
         static const std::string ERROR_INVALID_ARGUMENTS_SHORT;
         static const std::string ERROR_INVALID_NUMBER_SHORT;
         static const std::string ERROR_INVALID_SEQUENCE_SHORT;
         static const std::string ERROR_INVALID_DUPLICATE_SHORT;
         static const std::string ERROR_INVALID_RANGE_SHORT;
 
-        // to calculate the time taken by the sorting algorithms
-        void calculateTime();
-        void calculateTimeVec();
-        void calculateTimeDeq();
-        void printTimeVec(const std::string& time);
-        void printTimeDeq(const std::string& time);
+
 };
 
 #endif
