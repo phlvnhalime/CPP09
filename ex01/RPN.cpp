@@ -50,9 +50,10 @@ void RPN::run(const std::string &expression)
             if(_stack.size() < 2)
             {
                 std::cerr << "Error" << std::endl;
+                return;
             }
-            int a = _stack.top();
-            _stack.pop();
+            int a = _stack.top(); // top is the last element of the stack
+            _stack.pop(); // pop is removing the last element of the stack
             int b = _stack.top();
             _stack.pop();
             int res;
